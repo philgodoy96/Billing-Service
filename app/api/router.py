@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 
 from app.modules.accounts.routes import router as accounts_router
+from app.modules.audit_logs.routes import router as audit_logs_router
 from app.modules.checkout_sessions.routes import router as checkout_sessions_router
 from app.modules.invoices.routes import router as invoices_router
 from app.modules.plans.routes import router as plans_router
@@ -19,3 +20,4 @@ api_router.include_router(plans_router)
 api_router.include_router(subscriptions_router)
 api_router.include_router(invoices_router)
 api_router.include_router(checkout_sessions_router)
+api_router.include_router(audit_logs_router)

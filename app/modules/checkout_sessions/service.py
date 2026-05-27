@@ -15,10 +15,8 @@ from app.modules.invoices.service import InvoiceService
 from app.modules.payment_attempts.models import PaymentAttempt
 from app.modules.payment_attempts.service import PaymentAttemptService
 from app.modules.providers.fake_provider import FakePaymentProvider
-from app.modules.providers.schemas import (
-    CreateProviderCheckoutRequest,
-    ProviderCheckoutMetadata,
-)
+from app.modules.providers.schemas import CreateProviderCheckoutRequest, ProviderCheckoutMetadata
+
 
 
 class CheckoutSessionService:
