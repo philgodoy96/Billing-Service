@@ -1,21 +1,21 @@
 from datetime import datetime
+from typing import Any
 
 from pydantic import BaseModel
 
-from app.modules.payment_attempts.models import PaymentAttemptStatus
+from app.modules.payment_events.models import PaymentEventStatus
 
 
-class PaymentAttemptResponse(BaseModel):
+class PaymentEventResponse(BaseModel):
     id: str
-    invoice_id: str
-    checkout_session_id: str
-    provider_payment_id: str | None
-    status: PaymentAttemptStatus
-    amount_cents: int
-    currency: str
-    failure_reason: str | None
-    created_at: datetime
-    updated_at: datetime
+    provider_name: str
+    provider_event_id: str
+    event_type: str
+    payload: dict[str, Any]
+    status: PaymentEventStatus
+    received_at: datetime
+    processed_at: datetime | None
+    error_message: str | None
 
     model_config = {
         "from_attributes": True,

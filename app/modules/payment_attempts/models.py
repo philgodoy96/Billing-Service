@@ -1,22 +1,24 @@
 import uuid
 from datetime import datetime
 from enum import StrEnum
+from typing import Any
 
-from sqlalchemy import DateTime, Enum, ForeignKey, Integer, String
+from sqlalchemy import DateTime, Enum, JSON, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
 
 
-class PaymentAttemptStatus(StrEnum):
-    PENDING = "PENDING"
-    SUCCEEDED = "SUCCEEDED"
+class PaymentEventStatus(StrEnum):
+    RECEIVED = "RECEIVED"
+    PROCESSING = "PROCESSING"
+    PROCESSED = "PROCESSED"
     FAILED = "FAILED"
-    CANCELLED = "CANCELLED"
+    IGNORED = "IGNORED"
 
 
-class PaymentAttempt(Base):
-    __tablename__ = "payment_attempts"
+class PaymentEvent(Base):
+    __tablename__ = "payment_events"
 
     id: Mapped[str] = mapped_column(
         String(36),
@@ -24,58 +26,51 @@ class PaymentAttempt(Base):
         default=lambda: str(uuid.uuid4()),
     )
 
-    invoice_id: Mapped[str] = mapped_column(
-        String(36),
-        ForeignKey("invoices.id"),
+    provider_name: Mapped[str] = mapped_column(
+        String(50),
         nullable=False,
+        default="fake_provider",
         index=True,
     )
 
-    checkout_session_id: Mapped[str] = mapped_column(
-        String(36),
-        ForeignKey("checkout_sessions.id"),
-        nullable=False,
-        index=True,
-    )
-
-    provider_payment_id: Mapped[str | None] = mapped_column(
+    provider_event_id: Mapped[str] = mapped_column(
         String(100),
-        nullable=True,
+        nullable=False,
         unique=True,
         index=True,
     )
 
-    status: Mapped[PaymentAttemptStatus] = mapped_column(
-        Enum(PaymentAttemptStatus),
+    event_type: Mapped[str] = mapped_column(
+        String(100),
         nullable=False,
-        default=PaymentAttemptStatus.PENDING,
         index=True,
     )
 
-    amount_cents: Mapped[int] = mapped_column(
-        Integer,
+    payload: Mapped[dict[str, Any]] = mapped_column(
+        JSON,
         nullable=False,
     )
 
-    currency: Mapped[str] = mapped_column(
-        String(3),
+    status: Mapped[PaymentEventStatus] = mapped_column(
+        Enum(PaymentEventStatus),
         nullable=False,
+        default=PaymentEventStatus.RECEIVED,
+        index=True,
     )
 
-    failure_reason: Mapped[str | None] = mapped_column(
-        String(500),
+    received_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        nullable=False,
+        default=datetime.utcnow,
+        index=True,
+    )
+
+    processed_at: Mapped[datetime | None] = mapped_column(
+        DateTime,
         nullable=True,
     )
 
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime,
-        nullable=False,
-        default=datetime.utcnow,
-    )
-
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime,
-        nullable=False,
-        default=datetime.utcnow,
-        onupdate=datetime.utcnow,
+    error_message: Mapped[str | None] = mapped_column(
+        String(500),
+        nullable=True,
     )

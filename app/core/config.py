@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     database_url: str = "sqlite:///./billing_platform.db"
 
     fake_provider_webhook_secret: str = "local-dev-secret"
+    webhook_signature_tolerance_seconds: int = 300
 
     model_config = SettingsConfigDict(
         env_file=".env",
